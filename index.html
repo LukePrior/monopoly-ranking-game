@@ -36,12 +36,12 @@
             <div class="edition_1" style="height: 500px;">
                 <h2><a target="_blank" rel="noopener noreferrer">Edition 1</a></h2>
                 <img src="https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/images/monopoly.jpg" alt="placeholder">
-                <button onclick="recordRanking()">Pick me!</button>
+                <button onclick="recordRanking(1)">Pick me!</button>
             </div>
             <div class="edition_2" style="height: 500px;">
                 <h2><a target="_blank" rel="noopener noreferrer">Edition 2</a></h2>
                 <img src="https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/images/monopoly.jpg" alt="placeholder">
-                <button onclick="recordRanking()">Pick me!</button>
+                <button onclick="recordRanking(2)">Pick me!</button>
             </div>
         </div>
         <div style="display: flex; justify-content: space-around;">
@@ -115,11 +115,15 @@
             return (subset.length * subset.length - subset.length) / 2;
         }
 
-        function recordRanking() {
+        function recordRanking(number) {
             if (numberOfRankings() === calculateNumberOfPairings()) {
                 generateResults();
             } else {
-                rankings.push([current_item_1.name, current_item_2.name]);
+                if (number === 2) {
+                    rankings.push([current_item_2.name, current_item_1.name]);
+                } else {
+                    rankings.push([current_item_1.name, current_item_2.name]);
+                }
                 localStorage.setItem('rankings', JSON.stringify(rankings));
                 document.querySelector('#current_rankings').innerText = numberOfRankings();
                 displayItems()
