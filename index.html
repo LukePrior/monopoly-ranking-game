@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Best Monopoly Set</title>
+    </head>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        .edition_1, .edition_2 {
+            display: inline-block;
+            width: 40%;
+            text-align: center;
+        }
+        img {
+            height: 300px;
+        }
+        button {
+            display: block;
+            margin: 0 auto;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+    <body>
+        <h1>Best Monopoly Set</h1>
+        <div style="display: flex; justify-content: space-around;">
+            <p>Current rankings <span id="current_rankings">0</span>/<span id="total_rankings"></span></p>
+        </div>
+        <div style="display: flex; justify-content: space-around;">
+            <div class="edition_1" style="height: 500px;">
+                <h2><a target="_blank" rel="noopener noreferrer">Edition 1</a></h2>
+                <img src="" alt="placeholder">
+                <button onclick="recordRanking()">Pick me!</button>
+            </div>
+            <div class="edition_2" style="height: 500px;">
+                <h2><a target="_blank" rel="noopener noreferrer">Edition 2</a></h2>
+                <img src="" alt="placeholder">
+                <button onclick="recordRanking()">Pick me!</button>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-around;">
+            <button onclick="generateResults()">Results</button>
+            <button onclick="displayItems()">Next</button>
+            <button onclick="localStorage.clear(); location.reload();">Reset</button>
+        </div>
+        <div id="results"></div>
+    </body>
+    <script>
+        const url = 'https://gist.githubusercontent.com/LukePrior/d6e68a06ae914ef25ed80367c141956c/raw/e03b4896692f680452b70c9d2f378d05706cc299/variations.json';
+        var variations = [];
+        var subset = []
+        var rankings = [];
+        var current_item_1, current_item_2;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                variations = data;
+                setup();
+                displayItems();
+            });
+
+        function pickTwoRandomItems(list) {
+            const item1 = list[Math.floor(Math.random() * list.length)];
+            const item2 = list[Math.floor(Math.random() * list.length)];
+            if (item1 === item2) {
+                return pickTwoRandomItems(list);
+            }
+            if (rankings.some(ranking => ranking[0] === item1.name && ranking[1] === item2.name) || rankings.some(ranking => ranking[0] === item2.name && ranking[1] === item1.name)) {
+                return pickTwoRandomItems(list);
+            } else {
+                return [item1, item2];
+            }
+        }
+
+        function randomSet(x = 10) {
+            var temp = []
+            for (let i = 0; i < x; i++) {
+                temp.push(variations[Math.floor(Math.random() * variations.length)]);
+            }
+            subset = temp
+        }
+
+        function setup() {
+            variations = variations.filter(item => item.image && item.name && item.image.startsWith('https://'));
+            const storedSubset = localStorage.getItem('subset');
+            if (storedSubset) {
+                subset = JSON.parse(storedSubset);
+                const storedRankings = localStorage.getItem('rankings');
+                if (storedRankings) {
+                    rankings = JSON.parse(storedRankings);
+                    rankings = rankings.filter(ranking => subset.some(item => item.name === ranking[0]) && subset.some(item => item.name === ranking[1]));
+                    localStorage.setItem('rankings', JSON.stringify(rankings));
+                    document.querySelector('#current_rankings').innerText = numberOfRankings();
+                }
+            } else {
+                randomSet()
+                localStorage.setItem('subset', JSON.stringify(subset));
+            }
+            document.querySelector('#total_rankings').innerText = calculateNumberOfPairings();
+        }
+
+        function numberOfRankings() {
+            return rankings.length;
+        }
+
+        function calculateNumberOfPairings() {
+            // cannot compare to self and a vs b is the same as b vs a
+            return (subset.length * subset.length - subset.length) / 2;
+        }
+
+        function recordRanking() {
+            if (numberOfRankings() === calculateNumberOfPairings()) {
+                generateResults();
+            } else {
+                rankings.push([current_item_1.name, current_item_2.name]);
+                localStorage.setItem('rankings', JSON.stringify(rankings));
+                document.querySelector('#current_rankings').innerText = numberOfRankings();
+                displayItems()
+            }
+        }
+
+        function generateResults() {
+            const results = [];
+            for (let i = 0; i < subset.length; i++) {
+                const item = subset[i];
+                const wins = rankings.filter(ranking => ranking[0] === item.name).length;
+                const losses = rankings.filter(ranking => ranking[1] === item.name).length;
+                results.push({
+                    name: item.name,
+                    wins: wins,
+                    losses: losses,
+                    image: item.image,
+                    url: item.url
+                });
+            }
+            // update the results div
+            const resultsDiv = document.querySelector('#results');
+            if (resultsDiv.innerHTML != '' && resultsDiv.style.display != 'none') {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'block';
+            results.sort((a, b) => b.wins - a.wins);
+            for (let i = 0; i < results.length; i++) {
+                const item = results[i];
+                const itemDiv = document.createElement('div');
+                itemDiv.style.display = 'flex';
+                itemDiv.style.justifyContent = 'space-around';
+                const itemImage = document.createElement('img');
+                itemImage.src = item.image;
+                itemImage.style.width = '100px';
+                itemImage.style.height = '100px';
+                itemDiv.appendChild(itemImage);
+                const itemText = document.createElement('p');
+                itemText.innerText = item.name + ' (' + item.wins + ' wins, ' + item.losses + ' losses)';
+                itemDiv.appendChild(itemText);
+                const itemLink = document.createElement('a');
+                itemLink.href = "https://monopoly.fandom.com" + item.url;
+                itemLink.innerText = 'View on Monopoly Wiki';
+                itemDiv.appendChild(itemLink);
+                resultsDiv.appendChild(itemDiv);
+            }
+        }
+
+        // given two items display them on the page
+        function displayItems() {
+            // only if there are items left to display
+            if (numberOfRankings() === calculateNumberOfPairings()) {
+                generateResults();
+                return;
+            }
+            const [item1, item2] = pickTwoRandomItems(subset);
+            document.querySelector('.edition_1 a').innerText = item1.name;
+            document.querySelector('.edition_1 img').src = item1.image;
+            document.querySelector('.edition_1 a').href = "https://monopoly.fandom.com/" + item1.url;
+            document.querySelector('.edition_2 a').innerText = item2.name;
+            document.querySelector('.edition_2 img').src = item2.image;
+            document.querySelector('.edition_2 a').href = "https://monopoly.fandom.com/" + item2.url;
+            current_item_1 = item1;
+            current_item_2 = item2;
+        }
+    </script>
+</html>
