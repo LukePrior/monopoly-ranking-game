@@ -35,12 +35,12 @@
         <div style="display: flex; justify-content: space-around;">
             <div class="edition_1" style="height: 500px;">
                 <h2><a target="_blank" rel="noopener noreferrer">Edition 1</a></h2>
-                <img src="" alt="placeholder">
+                <img src="https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/images/monopoly.jpg" alt="placeholder">
                 <button onclick="recordRanking()">Pick me!</button>
             </div>
             <div class="edition_2" style="height: 500px;">
                 <h2><a target="_blank" rel="noopener noreferrer">Edition 2</a></h2>
-                <img src="" alt="placeholder">
+                <img src="https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/images/monopoly.jpg" alt="placeholder">
                 <button onclick="recordRanking()">Pick me!</button>
             </div>
         </div>
@@ -88,7 +88,7 @@
         }
 
         function setup() {
-            variations = variations.filter(item => item.image && item.name && item.image.startsWith('https://'));
+            variations = variations.filter(item => item.image && item.name);
             const storedSubset = localStorage.getItem('subset');
             if (storedSubset) {
                 subset = JSON.parse(storedSubset);
@@ -140,6 +140,7 @@
                     url: item.url
                 });
             }
+            // update the results div
             const resultsDiv = document.querySelector('#results');
             if (resultsDiv.innerHTML != '' && resultsDiv.style.display != 'none') {
                 resultsDiv.style.display = 'none';
@@ -154,7 +155,7 @@
                 itemDiv.style.display = 'flex';
                 itemDiv.style.justifyContent = 'space-around';
                 const itemImage = document.createElement('img');
-                itemImage.src = item.image;
+                itemImage.src = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item.image;
                 itemImage.style.width = '100px';
                 itemImage.style.height = '100px';
                 itemDiv.appendChild(itemImage);
@@ -178,11 +179,11 @@
             }
             const [item1, item2] = pickTwoRandomItems(subset);
             document.querySelector('.edition_1 a').innerText = item1.name;
-            document.querySelector('.edition_1 img').src = item1.image;
-            document.querySelector('.edition_1 a').href = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item1.url;
+            document.querySelector('.edition_1 img').src = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item1.image;
+            document.querySelector('.edition_1 a').href = "https://monopoly.fandom.com/" + item1.url;
             document.querySelector('.edition_2 a').innerText = item2.name;
-            document.querySelector('.edition_2 img').src = item2.image;
-            document.querySelector('.edition_2 a').href = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item2.url;
+            document.querySelector('.edition_2 img').src = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item2.image;
+            document.querySelector('.edition_2 a').href = "https://monopoly.fandom.com/" + item2.url;
             current_item_1 = item1;
             current_item_2 = item2;
         }
