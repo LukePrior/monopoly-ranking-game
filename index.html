@@ -17,6 +17,7 @@
             text-align: center;
         }
         img {
+            max-width: 100%;
             height: 300px;
         }
         button {
@@ -51,7 +52,7 @@
         <div id="results"></div>
     </body>
     <script>
-        const url = 'https://gist.githubusercontent.com/LukePrior/d6e68a06ae914ef25ed80367c141956c/raw/e03b4896692f680452b70c9d2f378d05706cc299/variations.json';
+        const url = 'https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/variations.json';
         var variations = [];
         var subset = []
         var rankings = [];
@@ -179,10 +180,10 @@
             const [item1, item2] = pickTwoRandomItems(subset);
             document.querySelector('.edition_1 a').innerText = item1.name;
             document.querySelector('.edition_1 img').src = item1.image;
-            document.querySelector('.edition_1 a').href = "https://monopoly.fandom.com/" + item1.url;
+            document.querySelector('.edition_1 a').href = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item1.url;
             document.querySelector('.edition_2 a').innerText = item2.name;
             document.querySelector('.edition_2 img').src = item2.image;
-            document.querySelector('.edition_2 a').href = "https://monopoly.fandom.com/" + item2.url;
+            document.querySelector('.edition_2 a').href = "https://raw.githubusercontent.com/LukePrior/monopoly-ranking-game/main/" + item2.url;
             current_item_1 = item1;
             current_item_2 = item2;
         }
